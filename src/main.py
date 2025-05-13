@@ -10,12 +10,16 @@ load_dotenv(".env")
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_SERVER = os.getenv("DB_SERVER")  # Default SQL Server port is 1433
+DB_SERVER = os.getenv("DB_SERVER")  # SQL Server hostname/IP
+DB_PORT = os.getenv("DB_PORT", "1433")  # Default SQL Server port is 1433
 DB_NAME = os.getenv("DB_NAME")
 
-ODBC_DRIVER = "ODBC Driver 17 for SQL Server"
+ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
 
-DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_NAME}?driver={ODBC_DRIVER.replace(' ', '+')}"
+# Format connection string with port
+SERVER_PORT = f"{DB_SERVER},{DB_PORT}" if DB_PORT else DB_SERVER
+# Adding TrustServerCertificate=yes to bypass SSL validation issues
+DATABASE_URL = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{SERVER_PORT}/{DB_NAME}?driver={ODBC_DRIVER.replace(' ', '+')}&TrustServerCertificate=yes"
 
 
 class HeroBase(SQLModel):
